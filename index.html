@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload JSON and Save API</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Upload JSON and Create API</h1>
+    <form id="jsonForm">
+      <label for="jsonInput">Insert your JSON:</label>
+      <textarea id="jsonInput" placeholder='{"key": "value"}'></textarea>
+      <br>
+      <label for="apiName">API Name:</label>
+      <input type="text" id="apiName" placeholder="Enter API name" required />
+      <br>
+      <button type="submit">Save JSON</button>
+    </form>
+    <div class="response" id="response"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('jsonForm');
+    const responseDiv = document.getElementById('response');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const jsonInput = document.getElementById('jsonInput').value;
+      const apiName = document.getElementById('apiName').value;
+
+      try {
+        const response = await fetch('/.netlify/functions/saveJson', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ apiName, json: jsonInput }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          responseDiv.textContent = `API created successfully! Access it at: ${result.url}`;
+        } else {
+          responseDiv.textContent = `Error: ${result.message}`;
+        }
+      } catch (error) {
+        responseDiv.textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
